@@ -8,14 +8,13 @@
 # This software is provided FOR EDUCATIONAL USE ONLY, the writer assumes no risk or fault if you are late to your job.
 # That is your own fault. 
 
+
+# For directory movements
 import os
 
-
-# TODO re-write in python 2 for backwards compatibility 
-
-from tkinter import *   ## notice capitalized T in Tkinter 
-import tkinter.filedialog
-#from tkinter import *
+# Imports modified for python 2 compatibility
+from Tkinter import *
+import tkFileDialog
 
 
 # Define needed base values (They're chunky and they know it)
@@ -38,7 +37,7 @@ master = Tk()
 def callback():
 	''' Creates button that throws a file selecton box to the user. Selected file will be old file to parse through.'''
 	global fileMod
-	fileMod = tkinter.filedialog.askopenfilename()
+	fileMod = tkFileDialog.askopenfilename() # Line modified for python 2 compatibility
 	master.quit()
 
 # Create and pack in dialog and button. Enter loop.
@@ -53,6 +52,11 @@ mainloop()
 
 # Open up given file and create new
 oldFile = open(fileMod, "r+")
+
+# Quick and dirty directory movement out of application bundle into parent directory
+os.chdir("..")
+os.chdir("..")
+os.chdir("..")
 newFile = open("modified.ics", "w")
 
 # Parse file to find UIDs and start/end time pairs, adds UIDs to array and groups start/end into arrays and appends to larger array
