@@ -44,7 +44,7 @@ def callback():
 # Create and pack in dialog and button. Enter loop awaiting user file selection
 T = Text(master, height=7, width=50)
 T.pack()
-T.insert(END, "/////////////////Welcome to Pepper////////////////\n\nClick the below button to select your downloaded\n.ics file from myPage. Modified file will be\nsaved into the folder you put Pepper in. ")
+T.insert(END, "/////////////////Welcome to Pepper////////////////\n\nClick the button below to select your downloaded\n.ics file from myPage. Modified file will be\nsaved into the folder you put Pepper in. ")
 master.wm_title("Pepper")
 b = Button(master, text="Click to select file", command=callback)
 b.pack()
