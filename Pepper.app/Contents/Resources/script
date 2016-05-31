@@ -37,11 +37,11 @@ master = Tk()
 
 def callback():
 	''' Creates button that throws a file selecton box to the user. Selected file will be old file to parse through.'''
-	global fileMod
+	global fileMod # Quick and dirty fix for encapsulaton of tk button functions
 	fileMod = tkFileDialog.askopenfilename() # Line modified for python 2 compatibility
 	master.quit()
 
-# Create and pack in dialog and button. Enter loop.
+# Create and pack in dialog and button. Enter loop awaiting user file selection
 T = Text(master, height=7, width=50)
 T.pack()
 T.insert(END, "/////////////////Welcome to Pepper////////////////\n\nClick the below button to select your downloaded\n.ics file from myPage. Modified file will be\nsaved into the folder you put Pepper in. ")
@@ -55,15 +55,15 @@ try:
 	oldFile = open(fileMod, "r+")
 
 except NameError:
-	# TODO: make exit silent at this point
+	# TODO: make exit silent at this point for debugging purposes. Causes no issues with packaged app.
 	fileMod = 1
 
 
-# Quick and dirty directory movement out of application bundle into parent directory
+# Quick and dirty directory movement up and out of application bundle into parent directory
 os.chdir("..")
 os.chdir("..")
 os.chdir("..")
-newFile = open("modified.ics", "w")
+newFile = open("modified.ics", "w") 
 
 # Parse file to find UIDs and start/end time pairs, adds UIDs to array and groups start/end into arrays and appends to larger array
 oldIter = iter(oldFile)
