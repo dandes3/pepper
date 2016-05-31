@@ -9,8 +9,14 @@
 # That is your own fault. 
 
 import os
-from tkinter import *
+
+
+# TODO re-write in python 2 for backwards compatibility 
+
+from tkinter import *   ## notice capitalized T in Tkinter 
 import tkinter.filedialog
+#from tkinter import *
+
 
 # Define needed base values (They're chunky and they know it)
 baseString = ("BEGIN:VCALENDAR\nCALSCALE:GREGORIAN\nVERSION\nX-WR-CALNAME:Schedule\nBEGIN:VTIMEZONE\nTZID:America/New_York\nBEGIN:DAYLIGHT\nTZOFFSETFROM:-0500\nRRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU\nDTSTART:20070311T020000\nTZNAME:EDT\nTZOFFSETTO:-0400\nEND:DAYLIGHT\nBEGIN:STANDARD\nTZOFFSETFROM:-0400\nRRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU\nDTSTART:20071104T020000\nTZNAME:EST\nTZOFFSETTO:-0500\nEND:STANDARD\nEND:VTIMEZONE\n")
@@ -25,21 +31,23 @@ eventList = []
 uidCount = 0;
 eventCount = 0;
 
+
+# GUI window using TKinter. 
 master = Tk()
 
 def callback():
+	''' Creates button that throws a file selecton box to the user. Selected file will be old file to parse through.'''
 	global fileMod
 	fileMod = tkinter.filedialog.askopenfilename()
 	master.quit()
 
+# Create and pack in dialog and button. Enter loop.
 T = Text(master, height=5, width=50)
 T.pack()
 T.insert(END, "Welcome to Pepper.\n Click the below button to select your .ics\nfile from myPage. Modified file will be saved in\nthe folder you put Pepper in. ")
 master.wm_title("Pepper")
 b = Button(master, text="Click to select file", command=callback)
 b.pack()
-# Q = Text(master, height=1, width=50)
-# Q.pack()
 mainloop()
 
 
@@ -71,8 +79,6 @@ if uidCount > eventCount:
 	uidList.pop(0)
 	uidCount-=1
 
-#print(eventList)
-#print(uidList)
 # Close file and re-open as append mode for safety
 newFile.write(baseString)
 newFile.close()
@@ -83,9 +89,7 @@ for i in range(len(uidList)):
 	temp1 = string2+uidList[i]
 	temp2 = string3+eventList[i][1]
 	temp3 = string4+eventList[i][0]+string5
-	#print(temp1+temp2+temp3)
 	newFile.write(temp1+temp2+temp3)
-
 
 # Ends ics file
 newFile.write(string6)
