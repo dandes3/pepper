@@ -8,6 +8,8 @@
 # This software is provided FOR EDUCATIONAL USE ONLY, the writer assumes no risk or fault if you are late to your job.
 # That is your own fault. 
 
+# This should never be run outside of the packaged application in standalone mode.
+
 
 # For directory movements
 import os
@@ -30,7 +32,6 @@ eventList = []
 uidCount = 0;
 eventCount = 0;
 
-
 # GUI window using TKinter. 
 master = Tk()
 
@@ -41,17 +42,22 @@ def callback():
 	master.quit()
 
 # Create and pack in dialog and button. Enter loop.
-T = Text(master, height=5, width=50)
+T = Text(master, height=7, width=50)
 T.pack()
-T.insert(END, "Welcome to Pepper.\n Click the below button to select your .ics\nfile from myPage. Modified file will be saved in\nthe folder you put Pepper in. ")
+T.insert(END, "/////////////////Welcome to Pepper////////////////\n\nClick the below button to select your downloaded\n.ics file from myPage. Modified file will be\nsaved into the folder you put Pepper in. ")
 master.wm_title("Pepper")
 b = Button(master, text="Click to select file", command=callback)
 b.pack()
 mainloop()
 
+try:
+	# Open up given file and create new
+	oldFile = open(fileMod, "r+")
 
-# Open up given file and create new
-oldFile = open(fileMod, "r+")
+except NameError:
+	# TODO: make exit silent at this point
+	fileMod = 1
+
 
 # Quick and dirty directory movement out of application bundle into parent directory
 os.chdir("..")
