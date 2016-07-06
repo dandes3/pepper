@@ -20,6 +20,7 @@ from Tkinter import *
 import tkFileDialog
 import tkSimpleDialog
 
+# Pushes all Python windows to front in OS X 
 os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
 # Anchor for GUI window using TKinter. 
