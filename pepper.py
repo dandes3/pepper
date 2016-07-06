@@ -11,19 +11,35 @@
 # This should never be run outside of the packaged application in standalone mode.
 
 
-# For directory movements
+# For directory movements and termination
 import os
+import sys
 
 # Imports modified for python 2 compatibility
 from Tkinter import *
 import tkFileDialog
+import tkSimpleDialog
 
+os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
+
+# Anchor for GUI window using TKinter. 
+master = Tk()
+master.wm_title("Pepper")
+
+def nuke():
+	''' Assures when the program is exited prematurely, no files are written. '''
+	sys.exit()
+	master.destroy()
+
+# Assigns closing function to behaviour of master window
+master.protocol("WM_DELETE_WINDOW", nuke)
 
 # Define needed base values (They're chunky and they know it)
 baseString = ("BEGIN:VCALENDAR\nCALSCALE:GREGORIAN\nVERSION\nX-WR-CALNAME:Schedule\nBEGIN:VTIMEZONE\nTZID:America/New_York\nBEGIN:DAYLIGHT\nTZOFFSETFROM:-0500\nRRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU\nDTSTART:20070311T020000\nTZNAME:EDT\nTZOFFSETTO:-0400\nEND:DAYLIGHT\nBEGIN:STANDARD\nTZOFFSETFROM:-0400\nRRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU\nDTSTART:20071104T020000\nTZNAME:EST\nTZOFFSETTO:-0500\nEND:STANDARD\nEND:VTIMEZONE\n")
 string2 = ("BEGIN:VEVENT\nUID:")
 string3 = ("\nDTEND;TZID=America/New_York:")
-string4 = ("\nTRANSP:OPAQUE\nX-APPLE-TRAVEL-ADVISORY-BEHAVIOR:AUTOMATIC\nSUMMARY:Work\nDTSTART;TZID=America/New_York:")
+string4a = ("\nTRANSP:OPAQUE\nX-APPLE-TRAVEL-ADVISORY-BEHAVIOR:AUTOMATIC\nSUMMARY:")
+string4c = ("\nDTSTART;TZID=America/New_York:")
 string5 = ("\nLOCATION:300 Monticello Ave\, Macarthur Center\, Norfolk\, VA 23510\nDESCRIPTION:Work Schedule\nURL;VALUE=URI:https://mypage.apple.com\nEND:VEVENT\n")
 string6 = ("END:VCALENDAR\n")
 uidList = []
@@ -32,8 +48,27 @@ eventList = []
 uidCount = 0;
 eventCount = 0;
 
-# GUI window using TKinter. 
-master = Tk()
+# Test for config file, prompt for event name and create if doesn't exist
+try:
+    configFileTester = open('config.txt')
+    configFileTester.close()
+except IOError as e:
+	eventName = tkSimpleDialog.askstring("Initial Configuration", "Enter the name you want for the events")
+	if eventName == '':
+		nuke()
+	if eventName == ' ':
+		nuke()
+	configFile = open("config.txt", "w")
+	configFile.write(eventName)
+	configFile.close()
+
+# Pull name from config file
+with open('config.txt', 'r') as configFile:
+    eventName = configFile.readline()
+
+# Build new append string with event name from user
+string4 = string4a+eventName.rstrip("\n")+string4c
+
 
 def callback():
 	''' Creates button that throws a file selecton box to the user. Selected file will be old file to parse through.'''
@@ -44,8 +79,9 @@ def callback():
 # Create and pack in dialog and button. Enter loop awaiting user file selection
 T = Text(master, height=7, width=50)
 T.pack()
-T.insert(END, "/////////////////Welcome to Pepper////////////////\n\nClick the button below to select your downloaded\n.ics file from myPage. Modified file will be\nsaved into the folder you put Pepper in. ")
-master.wm_title("Pepper")
+T.configure(state='normal')
+T.insert(END, "//////////////// Welcome to Pepper ///////////////\n\nClick the button below to select your downloaded\n.ics file from myPage. Modified file will be\nsaved into the folder you put Pepper in. ")
+T.configure(state='disabled')
 b = Button(master, text="Click to select file", command=callback)
 b.pack()
 mainloop()
@@ -56,13 +92,13 @@ try:
 
 except NameError:
 	# TODO: make exit silent at this point for debugging purposes. Causes no issues with packaged app.
-	fileMod = 1
-
+	nuke()
 
 # Quick and dirty directory movement up and out of application bundle into parent directory
 os.chdir("..")
 os.chdir("..")
 os.chdir("..")
+
 newFile = open("modified.ics", "w") 
 
 # Parse file to find UIDs and start/end time pairs, adds UIDs to array and groups start/end into arrays and appends to larger array
@@ -92,6 +128,7 @@ if uidCount > eventCount:
 # Close file and re-open as append mode for safety
 newFile.write(baseString)
 newFile.close()
+
 newFile = open("modified.ics", "a+")
 
 # Constuct strings to write to file out of pre-made strings and scraped values
