@@ -21,11 +21,14 @@ import tkFileDialog
 import tkSimpleDialog
 
 # Pushes all Python windows to front in OS X 
-os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
+#os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
 # Anchor for GUI window using TKinter. 
 master = Tk()
 master.wm_title("Pepper")
+master.configure(background='grey')
+master.minsize(width=350, height=140)
+master.maxsize(width=350, height=140)
 
 def nuke():
 	''' Assures when the program is exited prematurely, no files are written. '''
@@ -78,11 +81,13 @@ def callback():
 	master.quit()
 
 # Create and pack in dialog and button. Enter loop awaiting user file selection
-T = Text(master, height=7, width=50)
-T.pack()
-T.configure(state='normal')
-T.insert(END, "//////////////// Welcome to Pepper ///////////////\n\nClick the button below to select your downloaded\n.ics file from myPage. Modified file will be\nsaved into the folder you put Pepper in. ")
-T.configure(state='disabled')
+#T = Text(master, height=7, width=50)
+#T.pack()
+#T.configure(state='normal')
+label1 = Label(master, text="                      Welcome                      \n\nClick the button below to select your downloaded\n.ics file from myPage. Modified file will be\nsaved into the folder you put Pepper in. \n", background='grey')
+#T.insert(END, "//////////////// Welcome to Pepper ///////////////\n\nClick the button below to select your downloaded\n.ics file from myPage. Modified file will be\nsaved into the folder you put Pepper in. ")
+#T.configure(state='disabled')
+label1.pack()
 b = Button(master, text="Click to select file", command=callback)
 b.pack()
 mainloop()
@@ -96,9 +101,9 @@ except NameError:
 	nuke()
 
 # Quick and dirty directory movement up and out of application bundle into parent directory
-os.chdir("..")
-os.chdir("..")
-os.chdir("..")
+# os.chdir("..")
+# os.chdir("..")
+# os.chdir("..")
 
 newFile = open("modified.ics", "w") 
 
