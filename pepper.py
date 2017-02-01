@@ -1,14 +1,21 @@
+#  ----------------------
+# | Created by Don Andes |
+#  ----------------------
 #
-# Created by Don Andes
+# ----------------------------------------------------------------------------------------------------------------------
 #
-
 # This program accepts an ICS calender file and scrapes events from it. It then re-writes these events
 # into a nicely re-formatted new ICS file that includes additional information such as address
 # for work, appropriate name, and URL to login to time site. 
 # This software is provided FOR EDUCATIONAL USE ONLY, the writer assumes no risk or fault if you are late to your job.
 # That is your own fault. 
+#
+# This is not configured to run in a standalone environment, it assumes it is being run as a packaged app. 
+#
+# If you're reading this I hope you know what you're doing, or at least think you do. 
+#
+# ----------------------------------------------------------------------------------------------------------------------
 
-# This should never be run outside of the packaged application in standalone mode.
 
 
 # For directory movements and termination
@@ -20,6 +27,7 @@ from Tkinter import *
 import tkFileDialog
 import tkSimpleDialog
 
+# TODO: Unbork this
 # Pushes all Python windows to front in OS X 
 #os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
@@ -100,6 +108,7 @@ except NameError:
 	# TODO: make exit silent at this point for debugging purposes. Causes no issues with packaged app.
 	nuke()
 
+# TODO: figure out how this will work as an app
 # Quick and dirty directory movement up and out of application bundle into parent directory
 # os.chdir("..")
 # os.chdir("..")
