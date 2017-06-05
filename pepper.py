@@ -165,12 +165,6 @@ except NameError:
 
 desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
 
-# TODO: figure out how this will work as an app
-# Quick and dirty directory movement up and out of application bundle into parent directory
-# os.chdir("..")
-# os.chdir("..")
-# os.chdir("..")
-
 os.chdir(desktop)
 
 newFile = open("modified.ics", "w") 
