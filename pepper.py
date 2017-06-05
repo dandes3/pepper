@@ -1,14 +1,20 @@
+#  ----------------------
+# | Created by Don Andes |
+#  ----------------------
 #
-# Created by Don Andes
+# ----------------------------------------------------------------------------------------------------------------------
 #
-
 # This program accepts an ICS calender file and scrapes events from it. It then re-writes these events
 # into a nicely re-formatted new ICS file that includes additional information such as address
 # for work, appropriate name, and URL to login to time site. 
 # This software is provided FOR EDUCATIONAL USE ONLY, the writer assumes no risk or fault if you are late to your job.
 # That is your own fault. 
-
-# This should never be run outside of the packaged application in standalone mode.
+#
+# This is not configured to run in a standalone environment, it assumes it is being run as a packaged app. 
+#
+# If you're reading this I hope you know what you're doing, or at least think you do. 
+#
+# ----------------------------------------------------------------------------------------------------------------------
 
 
 # For directory movements and termination
@@ -20,44 +26,21 @@ from Tkinter import *
 import tkFileDialog
 import tkSimpleDialog
 
+# TODO: Unbork this
 # Pushes all Python windows to front in OS X 
-os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
-
-
-
-def nuke():
-		''' Assures when the program is exited prematurely, no files are written. '''
-		sys.exit()
-		master.destroy()
-
-class Main():
-
-	def __init__(self, master):
-        self.master = master
-        self.master.title("Pepper")
-
-        self.button1 = Button(self.master, text="Click to select file", command = self.callback)
-        self.button1.grid(row=0, column=2, sticky=W)
-        #self.button2 = Button(self.master, text="Click Me 2", command = self.Open2)
-        # self.button2.grid(row=0, column=2, sticky=W)
-        # self.button3 = Button(self.master, text="Close", command = self.Close)
-        # self.button3.grid(row=1, column=0, sticky=W)
-
-	 
-	def Open1(self):
-	    second_window = Toplevel(self.master)
-	    window2 = Second(second_window)
-
-	def callback():
-		''' Creates button that throws a file selecton box to the user. Selected file will be old file to parse through.'''
-		global fileMod # Quick and dirty fix for encapsulaton of tk button functions
-		fileMod = tkFileDialog.askopenfilename() # Line modified for python 2 compatibility
-		master.quit()
-
+#os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
 # Anchor for GUI window using TKinter. 
 master = Tk()
-#master.wm_title("Pepper")
+master.wm_title("Pepper")
+master.configure(background='grey')
+master.minsize(width=350, height=140)
+master.maxsize(width=350, height=140)
+
+def nuke():
+	''' Assures when the program is exited prematurely, no files are written. '''
+	sys.exit()
+	master.destroy()
 
 # Assigns closing function to behaviour of master window
 master.protocol("WM_DELETE_WINDOW", nuke)
@@ -68,7 +51,9 @@ string2 = ("BEGIN:VEVENT\nUID:")
 string3 = ("\nDTEND;TZID=America/New_York:")
 string4a = ("\nTRANSP:OPAQUE\nX-APPLE-TRAVEL-ADVISORY-BEHAVIOR:AUTOMATIC\nSUMMARY:")
 string4c = ("\nDTSTART;TZID=America/New_York:")
-string5 = ("\nLOCATION:300 Monticello Ave\, Macarthur Center\, Norfolk\, VA 23510\nDESCRIPTION:Work Schedule\nURL;VALUE=URI:https://mypage.apple.com\nEND:VEVENT\n")
+string5a = ("\nLOCATION:")
+string5b = ("")
+string5c = ("\nDESCRIPTION:Work Schedule\nURL;VALUE=URI:https://mypage.apple.com\nEND:VEVENT\n")
 string6 = ("END:VCALENDAR\n")
 uidList = []
 eventList = []
@@ -76,50 +61,96 @@ eventList = []
 uidCount = 0;
 eventCount = 0;
 
+eventName = ""
+storeNum = ""
+
 # Test for config file, prompt for event name and create if doesn't exist
 try:
-    configFileTester = open('config.txt')
-    configFileTester.close()
+	with open('config.txt', 'r') as configFile:
+		eventName = configFile.readline()
+		storeNum = configFile.readline()
+
 except IOError as e:
-	Label(master, text="First Name").grid(row=0)
-	Label(master, text="Last Name").grid(row=1)
+	window = Toplevel(master)
+	window.attributes('-topmost', True)
+	window.title("Setup")
+	window.configure(background='grey')
+	window.minsize(width=250, height=200)
+	window.maxsize(width=250, height=200)
 
-	e1 = Entry(master)
-	e2 = Entry(master)
-	e1.insert(10,"Miller")
-	e2.insert(10,"Jill")
+	def babyNuke():
+		window.destroy()
+		nuke()
 
-	e1.grid(row=0, column=1)
-	e2.grid(row=1, column=1)
+	window.protocol("WM_DELETE_WINDOW", babyNuke)
 
-	Button(master, text='Cancel', command=nuke()).grid(row=3, column=0, sticky=W, pady=4)
-	Button(master, text='Show', command=show_entry_fields).grid(row=3, column=1, sticky=W, pady=4)
+	doc1 = Label(window, text="\nEnter the name for parsed events", background='grey')
+	doc1.pack()
+	v = StringVar()
+	e = Entry(window, textvariable=v)
+	e.pack()
+	v.set("Work")
+	
+	doc2 = Label(window, text="\nSelect your store number", background='grey')
+	doc2.pack()
 
-	mainloop( )
-	# eventName = tkSimpleDialog.askstring("Initial Configuration", "Enter the name you want for the events")
-	# testBox = tkSimpleDialog.askstring("Test", "Test")
-	# if eventName == '':
-	# 	nuke()
-	# if eventName == ' ':
-	# 	nuke()
-	# configFile = open("config.txt", "w")
-	# configFile.write(eventName)
-	# configFile.close()
+	v2 = StringVar(window)
+	v2.set("R211") # initial value
 
-# Pull name from config file
-with open('config.txt', 'r') as configFile:
-    eventName = configFile.readline()
+	option = OptionMenu(window, v2, "R211", "R614")
+	option.pack()
+
+	goNow = False
+
+	def setupDone():
+		goNow = True
+		eventName = v.get()
+		storeNum = v2.get()
+
+		if eventName == '' or eventName == ' ':
+			nuke()
+
+		configFile = open("config.txt", "w")
+
+		configFile.write(eventName)
+		configFile.write("\n")
+		configFile.write(storeNum)
+		configFile.close()
+
+		window.destroy()
+
+
+
+	doc3 = Label(window, text="\n", background='grey')
+	doc3.pack()
+
+	button = Button(window, text="Enter", command=setupDone)
+	button.pack()
+
 
 # Build new append string with event name from user
 string4 = string4a+eventName.rstrip("\n")+string4c
+cleanStoreNum = storeNum.rstrip("\n")
 
+# Address builder
+if cleanStoreNum == "R211":
+	string5b = ("300 Monticello Ave\, Macarthur Center\, Norfolk\, VA 23510")
+
+elif cleanStoreNum == "R614":
+	string5b = ("701 Lynnhaven Parkway\, Virginia Beach\, VA 23452")
+
+
+string5 = string5a+string5b+string5c
+
+def callback():
+	''' Creates button that throws a file selecton box to the user. Selected file will be old file to parse through.'''
+	global fileMod # Quick and dirty fix for encapsulaton of tk button functions
+	fileMod = tkFileDialog.askopenfilename() # Line modified for python 2 compatibility
+	master.quit()
 
 # Create and pack in dialog and button. Enter loop awaiting user file selection
-T = Text(master, height=7, width=50)
-T.pack()
-T.configure(state='normal')
-T.insert(END, "//////////////// Welcome to Pepper ///////////////\n\nClick the button below to select your downloaded\n.ics file from myPage. Modified file will be\nsaved into the folder you put Pepper in. ")
-T.configure(state='disabled')
+label1 = Label(master, text="                      Welcome                      \n\nClick the button below to select your downloaded\n.ics file from myPage. Modified file will be\nsaved onto your desktop. \n", background='grey')
+label1.pack()
 b = Button(master, text="Click to select file", command=callback)
 b.pack()
 mainloop()
@@ -132,10 +163,9 @@ except NameError:
 	# TODO: make exit silent at this point for debugging purposes. Causes no issues with packaged app.
 	nuke()
 
-# Quick and dirty directory movement up and out of application bundle into parent directory
-os.chdir("..")
-os.chdir("..")
-os.chdir("..")
+desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
+
+os.chdir(desktop)
 
 newFile = open("modified.ics", "w") 
 
