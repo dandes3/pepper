@@ -12,8 +12,6 @@
 #
 # This is not configured to run in a standalone environment, it assumes it is being run as a packaged app. 
 #
-# If you're reading this I hope you know what you're doing, or at least think you do. 
-#
 # ----------------------------------------------------------------------------------------------------------------------
 
 
