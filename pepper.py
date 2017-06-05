@@ -17,7 +17,6 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-
 # For directory movements and termination
 import os
 import sys
@@ -52,7 +51,9 @@ string2 = ("BEGIN:VEVENT\nUID:")
 string3 = ("\nDTEND;TZID=America/New_York:")
 string4a = ("\nTRANSP:OPAQUE\nX-APPLE-TRAVEL-ADVISORY-BEHAVIOR:AUTOMATIC\nSUMMARY:")
 string4c = ("\nDTSTART;TZID=America/New_York:")
-string5 = ("\nLOCATION:300 Monticello Ave\, Macarthur Center\, Norfolk\, VA 23510\nDESCRIPTION:Work Schedule\nURL;VALUE=URI:https://mypage.apple.com\nEND:VEVENT\n")
+string5a = ("\nLOCATION:")
+string5b = ("")
+string5c = ("\nDESCRIPTION:Work Schedule\nURL;VALUE=URI:https://mypage.apple.com\nEND:VEVENT\n")
 string6 = ("END:VCALENDAR\n")
 uidList = []
 eventList = []
@@ -60,27 +61,86 @@ eventList = []
 uidCount = 0;
 eventCount = 0;
 
+eventName = ""
+storeNum = ""
+
 # Test for config file, prompt for event name and create if doesn't exist
 try:
-    configFileTester = open('config.txt')
-    configFileTester.close()
-except IOError as e:
-	eventName = tkSimpleDialog.askstring("Initial Configuration", "Enter the name you want for the events")
-	if eventName == '':
-		nuke()
-	if eventName == ' ':
-		nuke()
-	configFile = open("config.txt", "w")
-	configFile.write(eventName)
-	configFile.close()
+	with open('config.txt', 'r') as configFile:
+		eventName = configFile.readline()
+		storeNum = configFile.readline()
 
-# Pull name from config file
-with open('config.txt', 'r') as configFile:
-    eventName = configFile.readline()
+except IOError as e:
+	window = Toplevel(master)
+	window.attributes('-topmost', True)
+	window.title("Setup")
+	window.configure(background='grey')
+	window.minsize(width=250, height=200)
+	window.maxsize(width=250, height=200)
+
+	def babyNuke():
+		window.destroy()
+		nuke()
+
+	window.protocol("WM_DELETE_WINDOW", babyNuke)
+
+	doc1 = Label(window, text="\nEnter the name for parsed events", background='grey')
+	doc1.pack()
+	v = StringVar()
+	e = Entry(window, textvariable=v)
+	e.pack()
+	v.set("Work")
+	
+	doc2 = Label(window, text="\nSelect your store number", background='grey')
+	doc2.pack()
+
+	v2 = StringVar(window)
+	v2.set("R211") # initial value
+
+	option = OptionMenu(window, v2, "R211", "R614")
+	option.pack()
+
+	goNow = False
+
+	def setupDone():
+		goNow = True
+		eventName = v.get()
+		storeNum = v2.get()
+
+		if eventName == '' or eventName == ' ':
+			nuke()
+
+		configFile = open("config.txt", "w")
+
+		configFile.write(eventName)
+		configFile.write("\n")
+		configFile.write(storeNum)
+		configFile.close()
+
+		window.destroy()
+
+
+
+	doc3 = Label(window, text="\n", background='grey')
+	doc3.pack()
+
+	button = Button(window, text="Enter", command=setupDone)
+	button.pack()
+
 
 # Build new append string with event name from user
 string4 = string4a+eventName.rstrip("\n")+string4c
+cleanStoreNum = storeNum.rstrip("\n")
 
+# Address builder
+if cleanStoreNum == "R211":
+	string5b = ("300 Monticello Ave\, Macarthur Center\, Norfolk\, VA 23510")
+
+elif cleanStoreNum == "R614":
+	string5b = ("701 Lynnhaven Parkway\, Virginia Beach\, VA 23452")
+
+
+string5 = string5a+string5b+string5c
 
 def callback():
 	''' Creates button that throws a file selecton box to the user. Selected file will be old file to parse through.'''
@@ -89,12 +149,7 @@ def callback():
 	master.quit()
 
 # Create and pack in dialog and button. Enter loop awaiting user file selection
-#T = Text(master, height=7, width=50)
-#T.pack()
-#T.configure(state='normal')
-label1 = Label(master, text="                      Welcome                      \n\nClick the button below to select your downloaded\n.ics file from myPage. Modified file will be\nsaved into the folder you put Pepper in. \n", background='grey')
-#T.insert(END, "//////////////// Welcome to Pepper ///////////////\n\nClick the button below to select your downloaded\n.ics file from myPage. Modified file will be\nsaved into the folder you put Pepper in. ")
-#T.configure(state='disabled')
+label1 = Label(master, text="                      Welcome                      \n\nClick the button below to select your downloaded\n.ics file from myPage. Modified file will be\nsaved onto your desktop. \n", background='grey')
 label1.pack()
 b = Button(master, text="Click to select file", command=callback)
 b.pack()
@@ -108,11 +163,15 @@ except NameError:
 	# TODO: make exit silent at this point for debugging purposes. Causes no issues with packaged app.
 	nuke()
 
+desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
+
 # TODO: figure out how this will work as an app
 # Quick and dirty directory movement up and out of application bundle into parent directory
 # os.chdir("..")
 # os.chdir("..")
 # os.chdir("..")
+
+os.chdir(desktop)
 
 newFile = open("modified.ics", "w") 
 
