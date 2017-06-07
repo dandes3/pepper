@@ -1,19 +1,25 @@
 #  ----------------------
 # | Created by Don Andes |
-#  ----------------------
-#
 # ----------------------------------------------------------------------------------------------------------------------
-#
 # This program accepts an ICS calender file and scrapes events from it. It then re-writes these events
 # into a nicely re-formatted new ICS file that includes additional information such as address
 # for work, appropriate name, and URL to login to time site. 
-# This software is provided FOR EDUCATIONAL USE ONLY, the writer assumes no risk or fault if you are late to your job.
-# That is your own fault. 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+#      ___         ___           ___         ___         ___           ___     
+#     /\  \       /\__\         /\  \       /\  \       /\__\         /\  \    
+#    /::\  \     /:/ _/_       /::\  \     /::\  \     /:/ _/_       /::\  \   
+#   /:/\:\__\   /:/ /\__\     /:/\:\__\   /:/\:\__\   /:/ /\__\     /:/\:\__\  
+#  /:/ /:/  /  /:/ /:/ _/_   /:/ /:/  /  /:/ /:/  /  /:/ /:/ _/_   /:/ /:/  /  
+# /:/_/:/  /  /:/_/:/ /\__\ /:/_/:/  /  /:/_/:/  /  /:/_/:/ /\__\ /:/_/:/__/___
+# \:\/:/  /   \:\/:/ /:/  / \:\/:/  /   \:\/:/  /   \:\/:/ /:/  / \:\/:::::/  /
+#  \::/__/     \::/_/:/  /   \::/__/     \::/__/     \::/_/:/  /   \::/~~/~~~~ 
+#   \:\  \      \:\/:/  /     \:\  \      \:\  \      \:\/:/  /     \:\~~\     
+#    \:\__\      \::/  /       \:\__\      \:\__\      \::/  /       \:\__\    
+#     \/__/       \/__/         \/__/       \/__/       \/__/         \/__/    
 #
-# This is not configured to run in a standalone environment, it assumes it is being run as a packaged app. 
 #
 # ----------------------------------------------------------------------------------------------------------------------
-
+#
 
 # For directory movements and termination
 import os
@@ -23,10 +29,6 @@ import sys
 from Tkinter import *
 import tkFileDialog
 import tkSimpleDialog
-
-# TODO: Unbork this
-# Pushes all Python windows to front in OS X 
-#os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
 # Anchor for GUI window using TKinter. 
 master = Tk()
@@ -47,26 +49,25 @@ master.protocol("WM_DELETE_WINDOW", nuke)
 baseString = ("BEGIN:VCALENDAR\nCALSCALE:GREGORIAN\nVERSION\nX-WR-CALNAME:Schedule\nBEGIN:VTIMEZONE\nTZID:America/New_York\nBEGIN:DAYLIGHT\nTZOFFSETFROM:-0500\nRRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU\nDTSTART:20070311T020000\nTZNAME:EDT\nTZOFFSETTO:-0400\nEND:DAYLIGHT\nBEGIN:STANDARD\nTZOFFSETFROM:-0400\nRRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU\nDTSTART:20071104T020000\nTZNAME:EST\nTZOFFSETTO:-0500\nEND:STANDARD\nEND:VTIMEZONE\n")
 string2 = ("BEGIN:VEVENT\nUID:")
 string3 = ("\nDTEND;TZID=America/New_York:")
+string4 = ("")
 string4a = ("\nTRANSP:OPAQUE\nX-APPLE-TRAVEL-ADVISORY-BEHAVIOR:AUTOMATIC\nSUMMARY:")
 string4c = ("\nDTSTART;TZID=America/New_York:")
 string5a = ("\nLOCATION:")
 string5b = ("")
 string5c = ("\nDESCRIPTION:Work Schedule\nURL;VALUE=URI:https://mypage.apple.com\nEND:VEVENT\n")
 string6 = ("END:VCALENDAR\n")
+
 uidList = []
 eventList = []
-
 uidCount = 0;
 eventCount = 0;
-
-eventName = ""
 storeNum = ""
+eventName = ""
 
 # Test for config file, prompt for event name and create if doesn't exist
 try:
 	with open('config.txt', 'r') as configFile:
-		eventName = configFile.readline()
-		storeNum = configFile.readline()
+		configFile.close()
 
 except IOError as e:
 	window = Toplevel(master)
@@ -118,7 +119,6 @@ except IOError as e:
 		window.destroy()
 
 
-
 	doc3 = Label(window, text="\n", background='grey')
 	doc3.pack()
 
@@ -126,24 +126,36 @@ except IOError as e:
 	button.pack()
 
 
-# Build new append string with event name from user
-string4 = string4a+eventName.rstrip("\n")+string4c
-cleanStoreNum = storeNum.rstrip("\n")
-
-# Address builder
-if cleanStoreNum == "R211":
-	string5b = ("300 Monticello Ave\, Macarthur Center\, Norfolk\, VA 23510")
-
-elif cleanStoreNum == "R614":
-	string5b = ("701 Lynnhaven Parkway\, Virginia Beach\, VA 23452")
-
-
-string5 = string5a+string5b+string5c
 
 def callback():
 	''' Creates button that throws a file selecton box to the user. Selected file will be old file to parse through.'''
-	global fileMod # Quick and dirty fix for encapsulaton of tk button functions
-	fileMod = tkFileDialog.askopenfilename() # Line modified for python 2 compatibility
+	
+	# Quick and dirty fix for encapsulaton of tk button functions
+	global fileMod 
+	global string4
+	global string5
+
+	# Line modified for python 2 compatibility
+	fileMod = tkFileDialog.askopenfilename() 
+
+	# Pull configs from file
+	with open('config.txt', 'r') as configFile:
+		eventName = configFile.readline()
+		storeNum = configFile.readline()
+
+	# Build new append string with event name from user
+	string4 = string4a+eventName.rstrip("\n")+string4c
+	cleanStoreNum = storeNum.rstrip("\n")
+
+	# Address builder TODO: enumerate additional stores
+	if cleanStoreNum == "R211":
+		string5b = ("300 Monticello Ave\, Macarthur Center\, Norfolk\, VA 23510")
+
+	elif cleanStoreNum == "R614":
+		string5b = ("701 Lynnhaven Parkway\, Virginia Beach\, VA 23452")
+
+	# Build location string and escape
+	string5 = string5a+string5b+string5c
 	master.quit()
 
 # Create and pack in dialog and button. Enter loop awaiting user file selection
@@ -161,8 +173,8 @@ except NameError:
 	# TODO: make exit silent at this point for debugging purposes. Causes no issues with packaged app.
 	nuke()
 
+# Get absolute path to user desktop and cd in 
 desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
-
 os.chdir(desktop)
 
 newFile = open("modified.ics", "w") 
