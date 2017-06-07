@@ -30,7 +30,7 @@ from Tkinter import *
 import tkFileDialog
 import tkSimpleDialog
 
-# Anchor for GUI window using TKinter. 
+# Anchor for GUI window using TKinter
 master = Tk()
 master.wm_title("Pepper")
 master.configure(background='grey')
@@ -77,11 +77,11 @@ except IOError as e:
 	window.minsize(width=250, height=200)
 	window.maxsize(width=250, height=200)
 
-	def babyNuke():
+	def chainNuke():
 		window.destroy()
 		nuke()
 
-	window.protocol("WM_DELETE_WINDOW", babyNuke)
+	window.protocol("WM_DELETE_WINDOW", chainNuke)
 
 	doc1 = Label(window, text="\nEnter the name for parsed events", background='grey')
 	doc1.pack()
@@ -157,6 +157,7 @@ def callback():
 	# Build location string and escape
 	string5 = string5a+string5b+string5c
 	master.quit()
+	
 
 # Create and pack in dialog and button. Enter loop awaiting user file selection
 label1 = Label(master, text="                      Welcome                      \n\nClick the button below to select your downloaded\n.ics file from myPage. Modified file will be\nsaved onto your desktop. \n", background='grey')
